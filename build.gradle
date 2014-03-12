@@ -1,12 +1,3 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'net.sf.proguard:proguard-gradle:4.10'
-    }
-}
-
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
@@ -36,10 +27,7 @@ sourceCompatibility = config.java_version
 
 dependencies{
     compile 'log4j:log4j:1.2.17'
-    compile 'net.sf.jopt-simple:jopt-simple:4.5'
-    compile 'io.github.thefishlive:bootstrap:1.0.1'
     compile 'org.projectlombok:lombok:1.12.6'
-    compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.google.guava:guava:16.0.1'
     compile 'org.tukaani:xz:1.3'
     
@@ -47,8 +35,6 @@ dependencies{
 }
 
 jar {
-    from(configurations.compile.collect { zipTree(it).matching { include '**/*.class' } })
-    
     manifest { 
         attributes 'Version': config.version
     }
@@ -59,28 +45,6 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
-task shrinkJar(type: proguard.gradle.ProGuardTask, dependsOn: jar) {
-    ext {
-        outDir = file("${buildDir}/proguard")
-        obfuscatedJar = "${outDir}/${jar.baseName}-${jar.version}.jar"
-    }
-    outDir.mkdirs()
-    
-    injars jar.archivePath
-    outjars obfuscatedJar
-    libraryjars configurations.compile
-    configuration 'proguard.pro'
-}
-
-task shrinkOutput(type: Jar, dependsOn: shrinkJar) {
-    classifier = 'shrunk'
-    from zipTree(shrinkJar.obfuscatedJar)
-    manifest {
-        attributes 'Version': config.version
-    }
-}
-
 artifacts {
     archives sourcesJar
-    //archives shrinkOutput
 }
