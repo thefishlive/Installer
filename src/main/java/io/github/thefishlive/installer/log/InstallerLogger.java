@@ -8,10 +8,10 @@ import org.apache.log4j.Logger;
 
 public class InstallerLogger extends Logger {
 
-	private static final Logger infolog = Logger.getLogger("installer");
-	private static final Logger userlog = Logger.getLogger("installer.user");
-	private static final Logger debuglog = Logger.getLogger("installer.debug");
-	private static final Logger errorlog = Logger.getLogger("error");
+	@Getter private static final Logger infolog = Logger.getLogger("installer");
+	@Getter private static final Logger userlog = Logger.getLogger("installer.user");
+	@Getter private static final Logger debuglog = Logger.getLogger("installer.debug");
+	@Getter private static final Logger errorlog = Logger.getLogger("error");
 	
 	static {
 		if (InstallerUtils.isDebug()) {

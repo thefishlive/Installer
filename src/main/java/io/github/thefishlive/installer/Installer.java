@@ -10,6 +10,7 @@ import io.github.thefishlive.installer.download.Download;
 import io.github.thefishlive.installer.download.DownloadSet;
 import io.github.thefishlive.installer.event.PhaseChangeEvent;
 import io.github.thefishlive.installer.exception.InstallerException;
+import io.github.thefishlive.installer.exception.InstallerSubscriberExceptionHandler;
 import io.github.thefishlive.installer.log.InstallerLogger;
 import io.github.thefishlive.installer.task.Task;
 import io.github.thefishlive.installer.task.TaskSet;
@@ -21,7 +22,7 @@ public abstract class Installer {
 	@Getter private EventBus bus;
 	
 	public Installer() {
-		bus = new EventBus();
+		bus = new EventBus(new InstallerSubscriberExceptionHandler());
 		updatePhase(InstallPhase.SETUP);
 		
 		tasks.put(InstallPhase.PRE_DOWNLOAD, new TaskSet());
