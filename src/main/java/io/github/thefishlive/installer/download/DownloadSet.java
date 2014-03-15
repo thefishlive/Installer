@@ -36,8 +36,14 @@ public class DownloadSet extends HashSet<Download> implements PhaseAction<Task> 
 			Download download = itr.next();
 			InstallerLogger.getLog().debug("Downloading " + download.getFileDest().getName() + " (" + download.getDownloadUrl() + ")");
 			installer.getBus().post(new TaskExecuteEvent(download, installer));
-			download.perform(installer);
-			installer.getBus().post(new TaskCompleteEvent(download, Result.SUCCESS));
+			
+			try {
+				download.perform(installer);
+				installer.getBus().post(new TaskCompleteEvent(download, Result.SUCCESS));
+			} catch (InstallerException ex) {
+				installer.getBus().post(new TaskCompleteEvent(download, Result.FAIL));
+				throw ex;
+			}
 		}
 
 		downloaded = true;
