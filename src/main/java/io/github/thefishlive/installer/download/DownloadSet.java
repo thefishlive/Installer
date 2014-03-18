@@ -35,6 +35,8 @@ public class DownloadSet extends HashSet<Download> implements PhaseAction<Task> 
 		while(itr.hasNext()) {
 			Download download = itr.next();
 			InstallerLogger.getLog().debug("Downloading " + download.getFileDest().getName() + " (" + download.getDownloadUrl() + ")");
+			InstallerLogger.getLog().trace("Remote: " + download.getDownloadUrl().toString());
+			InstallerLogger.getLog().trace("Local:  " + download.getFileDest().getAbsolutePath());
 			installer.getBus().post(new TaskExecuteEvent(download, installer));
 			
 			try {

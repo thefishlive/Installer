@@ -27,6 +27,7 @@ public abstract class Download extends Task implements Closeable {
 	public Download() {
 		super("download");
 	}
+	
 	public abstract URL getDownloadUrl();
 	
 	public abstract File getFileDest();
