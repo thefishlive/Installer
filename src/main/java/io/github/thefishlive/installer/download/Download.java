@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -17,12 +18,14 @@ import lombok.Getter;
 
 import com.google.common.io.ByteStreams;
 
-public abstract class Download extends Task implements Closeable {
+public abstract class Download extends Task implements Closeable, Cloneable {
 
 	@Getter private int filesize;
+	
+	private URL checksumUrl;
 	private InputStream download;
 	private OutputStream local;
-	private boolean active = true;
+	protected boolean active = true;
 
 	public Download() {
 		super("download");
@@ -31,6 +34,16 @@ public abstract class Download extends Task implements Closeable {
 	public abstract URL getDownloadUrl();
 	
 	public abstract File getFileDest();
+
+	public abstract Download clone();
+	
+	public URL getChecksumUrl() throws IOException {
+		if (checksumUrl == null) {
+			checksumUrl = URI.create(getDownloadUrl().toExternalForm() + ".sha1").toURL();
+		}
+		
+		return checksumUrl;
+	}
 	
 	public boolean setup() throws InstallerException {
 		URL url = getDownloadUrl();
@@ -42,6 +55,7 @@ public abstract class Download extends Task implements Closeable {
 		
 		try {
 			URLConnection con = url.openConnection();
+			
 			download = con.getInputStream();
 			filesize = con.getContentLength();
 			local = new FileOutputStream(dest);
@@ -50,7 +64,8 @@ public abstract class Download extends Task implements Closeable {
 			throw new InstallerException(e);
 		}
 		
-		return true;
+		active = true;
+		return active;
 	}
 	
 	@Override
@@ -71,6 +86,8 @@ public abstract class Download extends Task implements Closeable {
 	@Override
 	public void close() throws IOException {
 		download.close();
+		local.flush();
 		local.close();
 	}
+	
 }

@@ -10,12 +10,14 @@ public class InstallerException extends Exception {
 	public static final InstallerException INSTALLER_OUT_OF_DATE = new InstallerException(InstallerError.INSTALLER_OUT_OF_DATE);
 	public static final InstallerException CONFIG_OUT_OF_DATE = new InstallerException(InstallerError.CONFIG_OUT_OF_DATE);
 	public static final InstallerException PROFILES_FILE_DOES_NOT_EXIST = new InstallerException(InstallerError.PROFILES_FILE_DOES_NOT_EXIST);
+	public static final InstallerException DOWNLOAD_NOT_SETUP = new InstallerException(InstallerError.DOWNLOAD_NOT_SETUP);
 
 	@AllArgsConstructor(access = AccessLevel.PRIVATE)
 	public static enum InstallerError {
 		INSTALLER_OUT_OF_DATE("The installer version you are using is out of date, please update"),
 		CONFIG_OUT_OF_DATE("The config you are using is out of date, specify a more upto date config"),
 		PROFILES_FILE_DOES_NOT_EXIST("The config you are using is out of date, specify a more upto date config"),
+		DOWNLOAD_NOT_SETUP("Downloads have not been initialialized, have you run the setup yet?"),
 		UNKNOWN_ERROR("A unknown error has occurred"),
 		;
 		

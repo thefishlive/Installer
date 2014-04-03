@@ -3,16 +3,19 @@ package io.github.thefishlive.installer.download;
 import java.io.File;
 import java.net.URL;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@AllArgsConstructor
 public class SimpleDownload extends Download {
 
 	@Getter private URL downloadUrl;
 	@Getter private File fileDest;
 
-	public SimpleDownload(URL url, File dest) {
-		this.downloadUrl = url;
-		this.fileDest = dest;
+	@Override
+	public Download clone() {
+		Download download = new SimpleDownload(this.downloadUrl, this.fileDest);
+		download.active = this.active;
+		return download;
 	}
-
 }

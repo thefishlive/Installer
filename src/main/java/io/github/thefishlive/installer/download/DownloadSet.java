@@ -2,9 +2,6 @@ package io.github.thefishlive.installer.download;
 
 import io.github.thefishlive.installer.Installer;
 import io.github.thefishlive.installer.PhaseAction;
-import io.github.thefishlive.installer.event.Event.Result;
-import io.github.thefishlive.installer.event.TaskCompleteEvent;
-import io.github.thefishlive.installer.event.TaskExecuteEvent;
 import io.github.thefishlive.installer.exception.InstallerException;
 import io.github.thefishlive.installer.log.InstallerLogger;
 import io.github.thefishlive.installer.task.Task;
@@ -15,44 +12,72 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 @SuppressWarnings("serial")
 public class DownloadSet extends HashSet<Download> implements PhaseAction<Task> {
 
+	private static final boolean THREADED = true;
+	private boolean setup = false;
 	private boolean downloaded = false;
 	
-	@Override
-	public boolean perform(Installer installer) throws InstallerException {
+	public boolean setup() throws InstallerException {
 		Iterator<Download> itr = iterator();
+		setup = true;
 		
 		while(itr.hasNext()) {
-			Download download = itr.next();
-			download.setup();
-		}
-		
-		itr = iterator();
-		
-		while(itr.hasNext()) {
-			Download download = itr.next();
-			InstallerLogger.getLog().debug("Downloading " + download.getFileDest().getName() + " (" + download.getDownloadUrl() + ")");
-			InstallerLogger.getLog().trace("Remote: " + download.getDownloadUrl().toString());
-			InstallerLogger.getLog().trace("Local:  " + download.getFileDest().getAbsolutePath());
-			installer.getBus().post(new TaskExecuteEvent(download, installer));
-			
 			try {
-				download.perform(installer);
-				installer.getBus().post(new TaskCompleteEvent(download, Result.SUCCESS));
+				Download download = itr.next();
+				download.setup();
 			} catch (InstallerException ex) {
-				installer.getBus().post(new TaskCompleteEvent(download, Result.FAIL));
+				setup = false;
 				throw ex;
 			}
 		}
-
-		downloaded = true;
 		
-		itr = iterator();
+		return setup;
+	}
+	
+	@Override
+	public boolean perform(Installer installer) throws InstallerException {
+		
+		setup(); // TODO extract to own task maybe
+		
+		if (!setup) {
+			throw InstallerException.DOWNLOAD_NOT_SETUP; // Should never be called.
+		}
+		
+		CountDownLatch latch = new CountDownLatch(size());
+		InstallerLogger.getLog().debug("Starting downloads (" + size() + ")");
+		Iterator<Download> itr = iterator();
+		
+		// Profiling
+		long starttime = System.currentTimeMillis();
 		
 		while(itr.hasNext()) {
+			Download download = itr.next();
+			DownloadWorker worker = new DownloadWorker(latch, installer, download);
+			
+			// Either run parallel downloads or sequential depending on mode selected.
+			if (THREADED) {
+				new Thread(worker, "Download-" + download.getFileDest().getName()).start();
+			} else {
+				worker.run();
+			}
+		}
+		
+		try {
+			latch.await(); // Wait for downloads to be finished;
+			InstallerLogger.getLog().info("Downloads tasks complete");
+		} catch (InterruptedException e) {
+			throw new InstallerException(e);
+		}
+		
+		InstallerLogger.getLog().debug("Downloads took " + (System.currentTimeMillis() - starttime) + " milliseconds to download."); // TODO get as low as possible :)
+		downloaded = true;
+		itr = iterator();
+		
+		while(itr.hasNext()) { // cleanup resources left by downloads.
 			try {
 				Download download = itr.next();
 				download.close();
