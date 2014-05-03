@@ -2,6 +2,7 @@ package io.github.thefishlive.installer.download;
 
 import io.github.thefishlive.installer.Installer;
 import io.github.thefishlive.installer.exception.InstallerException;
+import io.github.thefishlive.installer.log.InstallerLogger;
 import io.github.thefishlive.installer.task.Task;
 
 import java.io.Closeable;
@@ -20,11 +21,11 @@ import com.google.common.io.ByteStreams;
 
 public abstract class Download extends Task implements Closeable, Cloneable {
 
-	@Getter private int filesize;
+	@Getter protected int filesize;
 	
-	private URL checksumUrl;
-	private InputStream download;
-	private OutputStream local;
+	protected URL checksumUrl;
+	protected InputStream download;
+	protected OutputStream local;
 	protected boolean active = true;
 
 	public Download() {
@@ -35,7 +36,9 @@ public abstract class Download extends Task implements Closeable, Cloneable {
 	
 	public abstract File getFileDest();
 
-	public abstract Download clone();
+	public Download clone() {
+		return new InternalDownload(this);
+	}
 	
 	public URL getChecksumUrl() throws IOException {
 		if (checksumUrl == null) {
@@ -71,6 +74,7 @@ public abstract class Download extends Task implements Closeable, Cloneable {
 	@Override
 	public boolean perform(Installer install) throws InstallerException {
 		if (!active || download == null ) {
+			InstallerLogger.getLog().warn("Skipping download for " + getFileDest().getName());
 			return true;
 		}
 		

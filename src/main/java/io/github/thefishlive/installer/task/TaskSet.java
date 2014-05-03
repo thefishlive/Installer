@@ -9,20 +9,20 @@ import io.github.thefishlive.installer.exception.InstallerException;
 import io.github.thefishlive.installer.log.InstallerLogger;
 
 import java.util.AbstractSet;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import lombok.ToString;
 
 @ToString
 public class TaskSet extends AbstractSet<Task> implements PhaseAction<Task> {
 
-	private List<Task> tasks = null;
+	private Set<Task> tasks = null;
 	
 	public TaskSet() {
-		tasks = new ArrayList<>();
+		tasks = new HashSet<>();
 	}
 	
 	public boolean perform(Installer installer) throws InstallerException {
@@ -50,8 +50,9 @@ public class TaskSet extends AbstractSet<Task> implements PhaseAction<Task> {
 
 	@Override
 	public Iterator<Task> iterator() {
-		Collections.sort(tasks);
-		return new TaskIterator(tasks.toArray(new Task[size()]));
+		Task[] tasks = this.tasks.toArray(new Task[size()]);
+		Arrays.sort(tasks);
+		return new TaskIterator(tasks);
 	}
 
 	@Override

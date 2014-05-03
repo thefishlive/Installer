@@ -4,13 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 
-import lombok.Getter;
-import lombok.Setter;
-
 public class InstallerUtils {
 
-	@Getter @Setter private static boolean debug = false;
-	
 	private InstallerUtils() {}
 	
 	public static File getAppData() {

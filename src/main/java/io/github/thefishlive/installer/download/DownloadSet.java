@@ -4,6 +4,7 @@ import io.github.thefishlive.installer.Installer;
 import io.github.thefishlive.installer.PhaseAction;
 import io.github.thefishlive.installer.exception.InstallerException;
 import io.github.thefishlive.installer.log.InstallerLogger;
+import io.github.thefishlive.installer.options.InstallerOptions;
 import io.github.thefishlive.installer.task.Task;
 
 import java.io.File;
@@ -17,7 +18,6 @@ import java.util.concurrent.CountDownLatch;
 @SuppressWarnings("serial")
 public class DownloadSet extends HashSet<Download> implements PhaseAction<Task> {
 
-	private static final boolean THREADED = true;
 	private boolean setup = false;
 	private boolean downloaded = false;
 	
@@ -56,10 +56,10 @@ public class DownloadSet extends HashSet<Download> implements PhaseAction<Task> 
 		
 		while(itr.hasNext()) {
 			Download download = itr.next();
-			DownloadWorker worker = new DownloadWorker(latch, installer, download);
+			DownloadWorker worker = new DownloadWorker(latch, installer, download.clone());
 			
 			// Either run parallel downloads or sequential depending on mode selected.
-			if (THREADED) {
+			if (InstallerOptions.isThreadedDownloads()) {
 				new Thread(worker, "Download-" + download.getFileDest().getName()).start();
 			} else {
 				worker.run();
@@ -68,7 +68,7 @@ public class DownloadSet extends HashSet<Download> implements PhaseAction<Task> 
 		
 		try {
 			latch.await(); // Wait for downloads to be finished;
-			InstallerLogger.getLog().info("Downloads tasks complete");
+			InstallerLogger.getLog().debug("All downloads tasks complete");
 		} catch (InterruptedException e) {
 			throw new InstallerException(e);
 		}

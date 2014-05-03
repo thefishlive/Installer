@@ -12,10 +12,4 @@ public class SimpleDownload extends Download {
 	@Getter private URL downloadUrl;
 	@Getter private File fileDest;
 
-	@Override
-	public Download clone() {
-		Download download = new SimpleDownload(this.downloadUrl, this.fileDest);
-		download.active = this.active;
-		return download;
-	}
 }

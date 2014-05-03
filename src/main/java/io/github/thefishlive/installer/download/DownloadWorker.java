@@ -24,8 +24,8 @@ public class DownloadWorker implements Runnable {
 	@Override
 	public void run() {
 		InstallerLogger.getLog().debug("Downloading " + download.getFileDest().getName() + " (" + download.getDownloadUrl() + ")");
-		//InstallerLogger.getLog().trace("Remote: " + download.getDownloadUrl().toString());
-		//InstallerLogger.getLog().trace("Local:  " + download.getFileDest().getAbsolutePath());
+		InstallerLogger.getLog().trace("Remote: " + download.getDownloadUrl().toString());
+		InstallerLogger.getLog().trace("Local:  " + download.getFileDest().getAbsolutePath());
 		
 		installer.getBus().post(new TaskExecuteEvent(download, installer));
 		
