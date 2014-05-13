@@ -64,7 +64,10 @@ public abstract class Download extends Task implements Closeable, Cloneable {
 			local = new FileOutputStream(dest);
 		} catch (IOException e) {
 			active = false;
-			throw new InstallerException(e);
+            InstallerLogger.getLog().error("Error setting up download " + url.getHost());
+            InstallerLogger.getLog().error("Error: " + e.getClass().getName());
+            InstallerLogger.getLog().error("Message: " + e.getMessage());
+            return false;
 		}
 		
 		active = true;
@@ -89,6 +92,9 @@ public abstract class Download extends Task implements Closeable, Cloneable {
 	
 	@Override
 	public void close() throws IOException {
+        if (!active) {
+            return;
+        }
 		download.close();
 		local.flush();
 		local.close();

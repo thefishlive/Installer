@@ -3,6 +3,7 @@ package io.github.thefishlive.installer;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 
 import lombok.Getter;
@@ -17,7 +18,7 @@ import io.github.thefishlive.installer.task.TaskSet;
 
 public abstract class Installer {
 
-	@Getter private Map<InstallPhase, PhaseAction<Task>> tasks = new HashMap<>();
+	@Getter private Map<InstallPhase, PhaseAction<Task>> tasks = Maps.newLinkedHashMap();
 	@Getter private InstallPhase phase;
 	@Getter private EventBus bus;
 	

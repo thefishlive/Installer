@@ -1,5 +1,7 @@
 package io.github.thefishlive.installer.task;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import io.github.thefishlive.installer.Installer;
 import io.github.thefishlive.installer.PhaseAction;
 import io.github.thefishlive.installer.event.TaskCompleteEvent;
@@ -8,23 +10,15 @@ import io.github.thefishlive.installer.event.Event.Result;
 import io.github.thefishlive.installer.exception.InstallerException;
 import io.github.thefishlive.installer.log.InstallerLogger;
 
-import java.util.AbstractSet;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import lombok.ToString;
 
 @ToString
 public class TaskSet extends AbstractSet<Task> implements PhaseAction<Task> {
 
-	private Set<Task> tasks = null;
-	
-	public TaskSet() {
-		tasks = new HashSet<>();
-	}
-	
+	private List<Task> tasks = Lists.newLinkedList();
+
 	public boolean perform(Installer installer) throws InstallerException {
 		Iterator<Task> itr = iterator();
 		
@@ -50,8 +44,8 @@ public class TaskSet extends AbstractSet<Task> implements PhaseAction<Task> {
 
 	@Override
 	public Iterator<Task> iterator() {
+        Collections.sort(this.tasks);
 		Task[] tasks = this.tasks.toArray(new Task[size()]);
-		Arrays.sort(tasks);
 		return new TaskIterator(tasks);
 	}
 
