@@ -10,7 +10,9 @@ import lombok.ToString;
 @AllArgsConstructor
 public class PhaseChangeEvent extends Event {
 
-	@Getter private InstallPhase newPhase;
-	@Getter private Installer installer;
-	
+    @Getter
+    private InstallPhase newPhase;
+    @Getter
+    private Installer installer;
+
 }
