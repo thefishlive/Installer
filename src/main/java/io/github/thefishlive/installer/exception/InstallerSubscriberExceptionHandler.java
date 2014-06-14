@@ -16,7 +16,7 @@ public class InstallerSubscriberExceptionHandler implements SubscriberExceptionH
         log.error("Exception: " + exception.getMessage());
         log.error("Stacktrace: ", exception);
 
-        CrashReporter.uploadCrashReport("There was a error hasndling an event", exception);
+        CrashReporter.uploadCrashReport("There was a error handling an event", exception);
     }
 
 }
