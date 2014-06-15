@@ -3,7 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.thefishlive</groupId>
     <artifactId>installer</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.3</version>
+
+    <repositories>
+        <repository>
+            <id>codingbadgers-repo</id>
+            <name>codingbadgers-repo</name>
+            <url>http://repository-codingbadgers.forge.cloudbees.com/snapshot/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -39,7 +47,7 @@
         <dependency>
             <groupId>io.github.thefishlive</groupId>
             <artifactId>error-reporter</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
 
